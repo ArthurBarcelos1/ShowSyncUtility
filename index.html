@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Show Sync</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="container">
+    <div class="video-loader">
+      <input type="text" id="video-url" placeholder="Load Video URL">
+    </div>
+    <div class="video-container"></div>
+    <div class="controls">
+      <div class="current-time">
+        <span class="TimeTXT">Current Time:</span> <span class="TimeTXT" id="current-time">0.0</span>
+      </div>
+      <div class="add-keypoint">
+        <input type="text" id="keypoint-name" placeholder="KeyPoint Name">
+        <button id="new-keypoint">New KeyPoint</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/TimeSync.js"></script>
+</body>
+</html>
