@@ -5,6 +5,116 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Show Sync</title>
   <link rel="stylesheet" href="index.css">
+  <style>
+    /* Estilo do contêiner principal */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #f5f5f5;
+      height: 100vh;
+    }
+
+    .TimeTXT {
+      font-size: 30px;
+    }
+
+    /* Caixa de entrada para o link do vídeo */
+    #video-url {
+      width: 97%;
+      max-width: 800px;
+      padding: 10px;
+      margin: 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    /* Estiliza o iframe do vídeo para que ocupe o tamanho correto */
+    #video-frame {
+      width: 100%;
+      height: 450px;
+      width: 1000px;
+      border: none;
+      max-width: 800px;
+      margin: 0 auto; /* Centraliza horizontalmente */
+      display: block;
+    }
+
+    /* Seção de informações adicionais */
+    #info-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 80%;
+      max-width: 800px;
+      margin-top: 10px;
+    }
+
+    /* Tempo atual */
+    #current-time {
+      font-weight: bold;
+    }
+
+    /* Input para o nome do KeyPoint */
+    #keypoint-name {
+      width: 60%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    /* Input para ajustar o tempo */
+    #time-offset {
+      width: 60%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* Botão para adicionar KeyPoint */
+    #new-keypoint {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #new-keypoint:hover {
+      background-color: #0056b3;
+    }
+
+    /* Lista de KeyPoints */
+    #keypoints-list {
+      width: 80%;
+      max-width: 800px;
+      margin-top: 10px;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #keypoints-list div {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    #keypoints-list div:last-child {
+      border-bottom: none;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -20,8 +130,108 @@
         <input type="text" id="keypoint-name" placeholder="KeyPoint Name">
         <button id="new-keypoint">New KeyPoint</button>
       </div>
+      <div class="time-offset">
+        <input type="text" id="time-offset" placeholder="Adjust Time (e.g., -10.79 or 5.23)">
+      </div>
     </div>
+    <div id="keypoints-list"></div>
   </div>
-  <script src="js/TimeSync.js"></script>
+  <script>
+    // Seletores dos elementos HTML
+    const videoUrlInput = document.getElementById("video-url");
+    const currentTimeDisplay = document.getElementById("current-time");
+    const keypointNameInput = document.getElementById("keypoint-name");
+    const newKeypointButton = document.getElementById("new-keypoint");
+    const timeOffsetInput = document.getElementById("time-offset");
+    const keypointsList = document.getElementById("keypoints-list");
+
+    // Contêiner onde o player será renderizado
+    const videoContainer = document.querySelector(".video-container");
+
+    // Variável para o player do YouTube
+    let player;
+    let timeOffset = 0; // Variável para armazenar o tempo ajustado
+
+    // Função para carregar o vídeo a partir de uma URL ou ID
+    function loadVideo(url) {
+      let videoId;
+
+      if (url.includes("youtube.com") || url.includes("youtu.be")) {
+        const urlParams = new URL(url).searchParams;
+        videoId = urlParams.get("v") || url.split("/").pop();
+      } else {
+        videoId = url;
+      }
+
+      if (player) {
+        player.destroy();
+      }
+
+      player = new YT.Player("video-placeholder", {
+        videoId: videoId,
+        width: "800",
+        height: "450",
+        events: {
+          onReady: startTrackingTime,
+          onError: handlePlayerError,
+        },
+      });
+    }
+
+    function handlePlayerError(event) {
+      if (event.data === 150 || event.data === 101) {
+        const videoId = player.getVideoData().video_id;
+        const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        alert(`O vídeo selecionado não permite reprodução em outros sites. Você pode assisti-lo no YouTube: ${videoUrl}`);
+        window.open(videoUrl, "_blank");
+      } else {
+        alert("Erro ao carregar o vídeo. Verifique o link e tente novamente.");
+      }
+    }
+
+    function startTrackingTime() {
+      setInterval(() => {
+        if (player && player.getCurrentTime) {
+          const currentTime = player.getCurrentTime().toFixed(2);
+          currentTimeDisplay.textContent = `${currentTime} s`;
+        }
+      }, 100);
+    }
+
+    newKeypointButton.addEventListener("click", () => {
+      const keypointName = keypointNameInput.value.trim();
+      const offsetInputValue = parseFloat(timeOffsetInput.value) || 0;
+      timeOffset = offsetInputValue;
+
+      if (keypointName && player) {
+        const currentTime = player.getCurrentTime().toFixed(2);
+        const adjustedTime = (parseFloat(currentTime) + timeOffset).toFixed(2);
+
+        const keypointItem = document.createElement("div");
+        keypointItem.textContent = `${adjustedTime} s | ${keypointName}`;
+        keypointsList.insertBefore(keypointItem, keypointsList.firstChild);
+
+        keypointNameInput.value = "";
+      } else {
+        alert("Insira um nome para o KeyPoint ou carregue um vídeo primeiro!");
+      }
+    });
+
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName("script")[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    window.onYouTubeIframeAPIReady = function () {
+      const placeholder = document.createElement("div");
+      placeholder.id = "video-placeholder";
+      videoContainer.appendChild(placeholder);
+    };
+
+    videoUrlInput.addEventListener("change", () => {
+      const url = videoUrlInput.value;
+      loadVideo(url);
+    });
+  </script>
 </body>
 </html>
