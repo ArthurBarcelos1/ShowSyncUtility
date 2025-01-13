@@ -15,8 +15,22 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background-color: #f5f5f5;
+      background-color: #000000;
       height: 100vh;
+    }
+
+    .Advice {
+      color: white;
+      display: none;
+      margin: 30px;
+      text-align: justify;
+    }
+
+    .container {
+      background-color: #1b1b1b;
+      padding: 30px;
+      border-radius: 30px;
+      width: 800px;
     }
 
     .TimeTXT {
@@ -26,10 +40,10 @@
     /* Caixa de entrada para o link do vídeo */
     #video-url {
       width: 97%;
-      max-width: 800px;
+      max-width: 97%;
       padding: 10px;
       margin: 20px 0;
-      border: 1px solid #ccc;
+      border: 1px solid #464646;
       border-radius: 5px;
       font-size: 16px;
     }
@@ -50,8 +64,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 80%;
-      max-width: 800px;
+      width: 97%;
+      max-width: 97%;
       margin-top: 10px;
     }
 
@@ -62,16 +76,18 @@
 
     /* Input para o nome do KeyPoint */
     #keypoint-name {
-      width: 60%;
+      width: 80%;
+      max-width: 80%;
       padding: 8px;
-      border: 1px solid #ccc;
+      border: 1px solid #494949;
       border-radius: 5px;
       font-size: 14px;
     }
 
     /* Input para ajustar o tempo */
     #time-offset {
-      width: 60%;
+      width: 97%;
+      max-width: 97%;
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 5px;
@@ -82,28 +98,36 @@
     /* Botão para adicionar KeyPoint */
     #new-keypoint {
       padding: 10px 15px;
-      background-color: #007bff;
+      background-color: #313131;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .TimeTXT {
+      color: white;
     }
 
     #new-keypoint:hover {
-      background-color: #0056b3;
+      background-color: #161616;
     }
 
     /* Lista de KeyPoints */
     #keypoints-list {
-      width: 80%;
-      max-width: 800px;
+      width: 96.5%;
+      max-width: 96.5%;
       margin-top: 10px;
       background-color: #ffffff;
       border: 1px solid #ccc;
       border-radius: 5px;
       padding: 10px;
+      padding-top: 15px;
+      padding-bottom: 15px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      color: white;
     }
 
     #keypoints-list div {
@@ -114,6 +138,16 @@
     #keypoints-list div:last-child {
       border-bottom: none;
     }
+
+    @media (max-width: 900px) {
+
+    .container {
+      display: none;
+    }
+    .Advice {
+      display: block;
+    }
+}
   </style>
 </head>
 <body>
@@ -127,7 +161,7 @@
         <span class="TimeTXT">Current Time:</span> <span class="TimeTXT" id="current-time">0.0</span>
       </div>
       <div class="add-keypoint">
-        <input type="text" id="keypoint-name" placeholder="KeyPoint Name">
+        <input class="keypoint-name" type="text" id="keypoint-name" placeholder="KeyPoint Name">
         <button id="new-keypoint">New KeyPoint</button>
       </div>
       <div class="time-offset">
@@ -136,6 +170,7 @@
     </div>
     <div id="keypoints-list"></div>
   </div>
+  <h1 class="Advice">You must use this tool in a computer or in a bigger device.</h1>
   <script>
     // Seletores dos elementos HTML
     const videoUrlInput = document.getElementById("video-url");
